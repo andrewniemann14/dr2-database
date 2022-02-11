@@ -10,8 +10,8 @@ function connect() {
   $db_info = parse_ini_file('/home2/niemann8/kiskis/database.ini');
   $hostname = $db_info["hostname"];
   $database = $db_info["dr2_database"];
-  $username = $db_info["dr2_username"];
-  $password = $db_info["dr2_password"];
+  $username = $db_info["dr2_add_username"];
+  $password = $db_info["dr2_add_password"];
 
   try {
     $pdo = new PDO("mysql:host=$hostname;dbname=$database", $username, $password);
