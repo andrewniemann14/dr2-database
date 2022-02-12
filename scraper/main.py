@@ -12,10 +12,10 @@ leaderboards = scraper.get_leaderboards(challenges)
 
 
 # generate .json files
-date = challenges[0]["start"][0:10]
+date = challenges[0]["start"][0:10] # slice the date part of DateTime
 
-with open(f"challenges_{date}.json", "w") as f:
+with open(f"C:/Users/andre/projects/dr2-database/scraper/challenges_{date}.json", "w") as f:
   json.dump(challenges, f)
 
-with open(f"leaderboards_{date}.json", "w") as f:
+with open(f"C:/Users/andre/projects/dr2-database/scraper/leaderboards_{date}.json", "w") as f:
   json.dump(leaderboards, f)
