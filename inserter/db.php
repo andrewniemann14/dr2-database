@@ -15,7 +15,7 @@ function connect() {
 
   try {
     $pdo = new PDO("mysql:host=$hostname;dbname=$database", $username, $password);
-    $dbo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); // PDO uses fake prepared statements by default
+    $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); // PDO uses fake prepared statements by default
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     echo "Connection successful<br/>";
     return $pdo;
