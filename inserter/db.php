@@ -9,7 +9,7 @@ function connect() {
   // gets secure DB login information
   $db_info = parse_ini_file('/home2/niemann8/kiskis/database.ini');
   $hostname = $db_info["hostname"];
-  $database = $db_info["dr2_database"];
+  $database = $db_info["dr2_add_database"];
   $username = $db_info["dr2_add_username"];
   $password = $db_info["dr2_add_password"];
 
