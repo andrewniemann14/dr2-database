@@ -2,8 +2,8 @@ import json, sys
 import scraper # can't run on Hostgator
 
 
-days_ago = int(sys.argv[1]) # 0 would be 'main.py'
-# days_ago = 1
+# days_ago = int(sys.argv[1]) # 0 would be 'main.py'
+days_ago = 1
 
 
 # scrape the source website
