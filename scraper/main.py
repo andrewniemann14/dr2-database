@@ -1,5 +1,5 @@
 import json, sys
-import scraper # can't run on Hostgator
+import scraper
 
 
 # days_ago = int(sys.argv[1]) # 0 would be 'main.py'
@@ -14,8 +14,10 @@ leaderboards = scraper.get_leaderboards(challenges)
 # generate .json files
 date = challenges[0]["start"][0:10] # slice the date part of DateTime
 
-with open(f"C:/Users/andre/projects/dr2-database/scraper/challenges_{date}.json", "w") as f:
+"""
+with open("C:/Users/andre/projects/dr2-database/scraper/challenges_{}.json".format(date), "w") as f:
   json.dump(challenges, f)
 
-with open(f"C:/Users/andre/projects/dr2-database/scraper/leaderboards_{date}.json", "w") as f:
+with open("C:/Users/andre/projects/dr2-database/scraper/leaderboards_{}.json".format(date), "w") as f:
   json.dump(leaderboards, f)
+"""

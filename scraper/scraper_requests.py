@@ -7,15 +7,12 @@ vendor_dir = os.path.join(parent_dir, 'vendor')
 sys.path.append(vendor_dir)
 import requests
 
-# TODO: if all else fails, rewrite this to use urllib2, which is on the host by default
-
 
 # returns list of challenge dictionaries, ready to pass to a SQL query to insert into the challenges table
 def get_challenges(days_ago):
 
   print("Scraping challenges...")
 
-  # TODO: send GET request, encode response as JSON
   community_data = requests.get(
       "https://dirtrally2.dirtgame.com/api/Challenge/Community"
   ).json()
@@ -44,44 +41,53 @@ def get_challenges(days_ago):
 
   return list_of_challenges
 
-
 def get_leaderboards(list_of_challenges):
-  # TODO: another GET=>JSON request, this time with a session
   session = requests.Session()
-  token = session.get(
+  begin_session = session.get(
       "https://dirtrally2.dirtgame.com/api/ClientStore/GetInitialState"
-  ).json()["identity"]["token"]
+  )
+  
+  token = begin_session.json()["identity"]["token"] # good
+  
+  print(begin_session.cookies.keys()) # TODO: this cookie is not getting passed in the requests down below
+  cookie = begin_session.cookies.values()[0]
 
   print("Scraping leaderboards...")
 
   # returns JSON object of 100 entries
   def get_one_leaderboard(c, page):
-    # TODO: a POST request with a JSON parameter
-    # return session.post(
-    #     "https://dirtrally2.dirtgame.com/api/Leaderboard",
-    #     json={
-    #         "challengeId": c["id"], # these vars refer to ones created in the each_challenge for loop
-    #         "eventId": c["event_id"],
-    #         "stageId": c["stage_id"],
-    #         "orderByTotalTime": True,
-    #         "page": page,
-    #         "pageSize": 100,
-    #     },
-    #     headers={"RaceNet.XSRFH": token},
-    # ).json()
+    print(c) # good
+    print(page) # good
+
+    url = "https://dirtrally2.dirtgame.com/api/Leaderboard"
+
+    data = {
+      "challengeId": c["id"], # these vars refer to ones created in the each_challenge for loop
+      "eventId": c["event_id"],
+      "stageId": c["stage_id"],
+      "orderByTotalTime": True,
+      "page": page,
+      "pageSize": 100,
+    }
+
+    headers = {
+      "RaceNet.XSRFH": token,
+      "Connection": "keep-alive",
+      "Content-Type": "application/json;charset=UTF-8",
+      "Cookie": "RaceNet.XSRFC={}".format(cookie) # TODO: move from headers to cookies
+    }
+
+
     res = session.post(
-        "https://dirtrally2.dirtgame.com/api/Leaderboard",
-        json={
-            "challengeId": c["id"], # these vars refer to ones created in the each_challenge for loop
-            "eventId": c["event_id"],
-            "stageId": c["stage_id"],
-            "orderByTotalTime": True,
-            "page": page,
-            "pageSize": 100,
-        },
-        headers={"RaceNet.XSRFH": token},
+      url,
+      data=data,
+      headers=headers
     )
-    print(res.request.headers)
+    print("res.request.headers:",res.request.headers)
+    print("res:",res)
+    print("res.headers:",res.headers)
+
+    return res.json()
   
   list_of_entries = []
 
@@ -89,7 +95,6 @@ def get_leaderboards(list_of_challenges):
 
     # scrape page 1
     first_leaderboard = get_one_leaderboard(c, 1)
-    # print(first_leaderboard.request.headers)
     for entry in first_leaderboard["entries"]:
       entry_details = (c["id"], entry["rank"], entry["name"], entry["nationality"], entry["vehicleName"], entry["stageTime"], entry["stageDiff"], entry["isDnfEntry"])
       list_of_entries.append(entry_details)
@@ -107,3 +112,7 @@ def get_leaderboards(list_of_challenges):
   
   print("{} entries created".format(len(list_of_entries)))
   return list_of_entries
+
+
+
+get_leaderboards(get_challenges(1))
