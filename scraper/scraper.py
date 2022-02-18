@@ -1,28 +1,17 @@
-# import json
-import os, sys
-
-# Add vendor directory to module search path, to import from local source
-parent_dir = os.path.abspath(os.path.dirname(__file__))
-vendor_dir = os.path.join(parent_dir, 'vendor')
-sys.path.append(vendor_dir)
-import requests
-
-# TODO: if all else fails, rewrite this to use urllib2, which is on the host by default
 
 
-# returns list of challenge dictionaries, ready to pass to a SQL query to insert into the challenges table
+import json
+from http import cookiejar
+import urllib.request, urllib.parse
+
+
 def get_challenges(days_ago):
-
   print("Scraping challenges...")
-
-  # TODO: send GET request, encode response as JSON
-  community_data = requests.get(
-      "https://dirtrally2.dirtgame.com/api/Challenge/Community"
-  ).json()
-
-  daily_data = community_data[0]
-  # weekly_data = community_data[1]
-  # monthly_data = community_data[2]
+  res = urllib.request.urlopen("https://dirtrally2.dirtgame.com/api/Challenge/Community")
+  print(res)
+  decoded = res.read().decode()
+  daily_data = json.loads(decoded)[0]
+  print(daily_data["typeName"])
 
   list_of_challenges = []
 
@@ -43,67 +32,67 @@ def get_challenges(days_ago):
       list_of_challenges.append(c)
 
   return list_of_challenges
+  # end of get_challenges()
 
 
 def get_leaderboards(list_of_challenges):
-  session = requests.Session()
-  token = session.get(
-      "https://dirtrally2.dirtgame.com/api/ClientStore/GetInitialState"
-  ).json()["identity"]["token"]
+  def get_page(c, page):
 
-  print("Scraping leaderboards...")
+    data = json.dumps({"challengeId": c["id"],
+      "eventId": c["event_id"],
+      "stageId": c["stage_id"],
+      "orderByTotalTime": True,
+      "page": page,
+      "pageSize": 100
+    })
 
-  # returns JSON object of 100 entries
-  def get_one_leaderboard(c, page):
-    # return session.post(
-    #     "https://dirtrally2.dirtgame.com/api/Leaderboard",
-    #     json={
-    #         "challengeId": c["id"], # these vars refer to ones created in the each_challenge for loop
-    #         "eventId": c["event_id"],
-    #         "stageId": c["stage_id"],
-    #         "orderByTotalTime": True,
-    #         "page": page,
-    #         "pageSize": 100,
-    #     },
-    #     headers={"RaceNet.XSRFH": token},
-    # ).json()
-    res = session.post(
-        "https://dirtrally2.dirtgame.com/api/Leaderboard",
-        json={
-            "challengeId": c["id"], # these vars refer to ones created in the each_challenge for loop
-            "eventId": c["event_id"],
-            "stageId": c["stage_id"],
-            "orderByTotalTime": True,
-            "page": page,
-            "pageSize": 100,
-        },
-        headers={"RaceNet.XSRFH": token},
+    request = urllib.request.Request(
+      "https://dirtrally2.dirtgame.com/api/Leaderboard",
+      data = data.encode(),
+      headers = headers
     )
-    print(res.request.headers)
-    print(res)
-    return res.json()
-  
+
+    res = urllib.request.urlopen(request)
+    return json.loads(res.read().decode())
+    # end of get_page()
+
+  # set up CookieJar for the session
+  cj = cookiejar.CookieJar()
+  opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+  opener.addheaders.pop(0)
+  urllib.request.install_opener(opener) # this opener will be used for all further calls to urlopen()
+
+  # get the Token to pass in the header
+  with urllib.request.urlopen("https://dirtrally2.dirtgame.com/api/ClientStore/GetInitialState") as res:
+    decoded = res.read().decode()
+    token = json.loads(decoded)["identity"]["token"]
+    
+  headers = {
+    "RaceNet.XSRFH": token,
+    "Content-Type": "application/json"
+    }
+
+  # prepare empty end product
   list_of_entries = []
 
   for c in list_of_challenges:
 
-    # scrape page 1
-    first_leaderboard = get_one_leaderboard(c, 1)
-    # print(first_leaderboard.request.headers)
+    # do page 1 and get number of pages
+    first_leaderboard = get_page(c, 1)
     for entry in first_leaderboard["entries"]:
       entry_details = (c["id"], entry["rank"], entry["name"], entry["nationality"], entry["vehicleName"], entry["stageTime"], entry["stageDiff"], entry["isDnfEntry"])
       list_of_entries.append(entry_details)
 
-    # now we know how many pages there are
     pages = first_leaderboard['pageCount']
 
     # run it again for each page
     for i in range(2, pages+1): # +1 to include max
       print("Reading page {} of {}".format(i, pages))
-      leaderboard = get_one_leaderboard(c, i)
+      leaderboard = get_page(c, i)
       for entry in leaderboard["entries"]:
         entry_details = (c["id"], entry["rank"], entry["name"], entry["nationality"], entry["vehicleName"], entry["stageTime"], entry["stageDiff"], entry["isDnfEntry"])
         list_of_entries.append(entry_details)
   
   print("{} entries created".format(len(list_of_entries)))
   return list_of_entries
+  # end of get_leaderboards()

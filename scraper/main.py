@@ -2,8 +2,8 @@ import json, sys
 import scraper
 
 
-# days_ago = int(sys.argv[1]) # 0 would be 'main.py'
-days_ago = 1
+days_ago = int(sys.argv[1]) # 0 would be 'main.py'
+# days_ago = 1
 
 
 # scrape the source website
@@ -14,10 +14,9 @@ leaderboards = scraper.get_leaderboards(challenges)
 # generate .json files
 date = challenges[0]["start"][0:10] # slice the date part of DateTime
 
-"""
-with open("C:/Users/andre/projects/dr2-database/scraper/challenges_{}.json".format(date), "w") as f:
+# this works, though they don't seem to show up in the FTP
+with open("public_html/dr2insert/challenges_{}.json".format(date), "w") as f:
   json.dump(challenges, f)
 
-with open("C:/Users/andre/projects/dr2-database/scraper/leaderboards_{}.json".format(date), "w") as f:
+with open("public_html/dr2insert/leaderboards_{}.json".format(date), "w") as f:
   json.dump(leaderboards, f)
-"""

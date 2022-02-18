@@ -1,3 +1,6 @@
+# tried to get this working with requests 1.0, but keep running into error 500
+# probably just need to get the cookies working properly
+
 # import json
 import os, sys
 
