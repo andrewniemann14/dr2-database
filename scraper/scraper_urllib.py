@@ -1,6 +1,5 @@
 
 import json
-from pprint import pprint
 from http import cookiejar
 import urllib.request, urllib.parse
 
@@ -35,11 +34,12 @@ def get_challenges(days_ago):
 
 list_of_challenges = get_challenges(1)
 
-
-cj = cookiejar.CookieJar()
-opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
-opener.addheaders.pop(0)
-urllib.request.install_opener(opener) # this opener will be used for all further calls to urlopen()
+# TODO: get everything moved into functions
+def get_leaderboard(list_of_challenges):
+  cj = cookiejar.CookieJar()
+  opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+  opener.addheaders.pop(0)
+  urllib.request.install_opener(opener) # this opener will be used for all further calls to urlopen()
 
 
 
@@ -47,7 +47,8 @@ urllib.request.install_opener(opener) # this opener will be used for all further
 with urllib.request.urlopen("https://dirtrally2.dirtgame.com/api/ClientStore/GetInitialState") as res:
   decoded = res.read().decode()
   token = json.loads(decoded)["identity"]["token"]
-
+  
+  
 
 
 for c in list_of_challenges:
@@ -56,23 +57,31 @@ for c in list_of_challenges:
   url = "https://dirtrally2.dirtgame.com/api/Leaderboard"
 
   # this URL query string needs to be BYTES
-  data = urllib.parse.urlencode({"challengeId": c["id"],
+  # data = urllib.parse.urlencode({"challengeId": c["id"],
+  data = json.dumps({"challengeId": c["id"],
     "eventId": c["event_id"],
     "stageId": c["stage_id"],
     "orderByTotalTime": True,
     "page": 1, # change to parameter once function is working
     "pageSize": 10 # change to 100 "
-    })
+  })
   
-  headers = {"RaceNet.XSRFH": token}
+  headers = {
+    "RaceNet.XSRFH": token,
+    "Content-Type": "application/json"
+    }
 
   request = urllib.request.Request(
     url,
     data=data.encode(),
     headers=headers
-    )
+  )
 
-  urllib.request.urlopen(request)
+  # print(cj.make_cookies(res, request))
+  # pprint(request.headers)
+
+  res = urllib.request.urlopen(request)
+  print(res.read().decode())
 
 
   # with urllib.request.urlopen("https://dirtrally2.dirtgame.com/api/Leaderboard",

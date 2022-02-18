@@ -44,13 +44,14 @@ def get_challenges(days_ago):
 def get_leaderboards(list_of_challenges):
   session = requests.Session()
   begin_session = session.get(
-      "https://dirtrally2.dirtgame.com/api/ClientStore/GetInitialState"
+    "https://dirtrally2.dirtgame.com/api/ClientStore/GetInitialState"
   )
   
   token = begin_session.json()["identity"]["token"] # good
   
   print(begin_session.cookies.keys()) # TODO: this cookie is not getting passed in the requests down below
-  cookie = begin_session.cookies.values()[0]
+  print(begin_session)
+  print(begin_session.cookies)
 
   print("Scraping leaderboards...")
 
@@ -73,15 +74,19 @@ def get_leaderboards(list_of_challenges):
     headers = {
       "RaceNet.XSRFH": token,
       "Connection": "keep-alive",
-      "Content-Type": "application/json;charset=UTF-8",
-      "Cookie": "RaceNet.XSRFC={}".format(cookie) # TODO: move from headers to cookies
+      "Content-Type": "application/json",
+      "User-Agent": "python-requests/1.0.0",
+      "Accept-Encoding": "gzip, deflate"
     }
+
+    cookies = begin_session.cookies
 
 
     res = session.post(
       url,
       data=data,
-      headers=headers
+      headers=headers,
+      cookies=cookies
     )
     print("res.request.headers:",res.request.headers)
     print("res:",res)

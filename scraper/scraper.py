@@ -46,7 +46,6 @@ def get_challenges(days_ago):
 
 
 def get_leaderboards(list_of_challenges):
-  # TODO: another GET=>JSON request, this time with a session
   session = requests.Session()
   token = session.get(
       "https://dirtrally2.dirtgame.com/api/ClientStore/GetInitialState"
@@ -56,7 +55,6 @@ def get_leaderboards(list_of_challenges):
 
   # returns JSON object of 100 entries
   def get_one_leaderboard(c, page):
-    # TODO: a POST request with a JSON parameter
     # return session.post(
     #     "https://dirtrally2.dirtgame.com/api/Leaderboard",
     #     json={
@@ -82,6 +80,8 @@ def get_leaderboards(list_of_challenges):
         headers={"RaceNet.XSRFH": token},
     )
     print(res.request.headers)
+    print(res)
+    return res.json()
   
   list_of_entries = []
 
