@@ -4,6 +4,24 @@ import json
 from http import cookiejar
 import urllib.request, urllib.parse
 
+def get_today():
+  res = urllib.request.urlopen("https://dirtrally2.dirtgame.com/api/Challenge/Community")
+  decoded = res.read().decode()
+  daily_data = json.loads(decoded)[0]
+
+  todays_challenges = []
+
+  for each_challenge in daily_data['challengeGroups'][0]["challenges"]:
+    if (each_challenge["events"][0]["discipline"] == "eRally"):
+      c = {
+        "vehicle_class": each_challenge["vehicleClass"],
+        "country": each_challenge["events"][0]["stages"][0]["country"],
+        "stage": each_challenge["events"][0]["stages"][0]["name"] if (each_challenge["events"][0]["discipline"] == "eRally") else each_challenge["events"][0]["stages"][0]["location"],
+      }
+      todays_challenges.append(c)
+
+  return todays_challenges
+  # end of get_today()
 
 def get_challenges(days_ago):
   print("Scraping challenges...")
@@ -11,7 +29,6 @@ def get_challenges(days_ago):
   print(res)
   decoded = res.read().decode()
   daily_data = json.loads(decoded)[0]
-  print(daily_data["typeName"])
 
   list_of_challenges = []
 
@@ -23,6 +40,7 @@ def get_challenges(days_ago):
         "start": each_challenge["entryWindow"]["start"],
         "end": each_challenge["entryWindow"]["end"],
         # "discipline": each_challenge["events"][0]["discipline"],
+        "country": each_challenge["events"][0]["stages"][0]["country"],
         "stage": each_challenge["events"][0]["stages"][0]["name"] if (each_challenge["events"][0]["discipline"] == "eRally") else each_challenge["events"][0]["stages"][0]["location"],
         "vehicle_class": each_challenge["vehicleClass"],
         # these values go to the leaderboard query
