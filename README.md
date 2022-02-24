@@ -1,11 +1,12 @@
-# scraper:
-Python program scrapes official website for challenge and leaderboard data, saves results to JSON files
+DR2.0 Dashboard - data generator
+=
+This program automatically populates a database with DiRT Rally 2.0 daily challenge information. Will be used in a future project.
 
-'requests' library not allowed on Hostgator, so it has to be done locally and the JSON files FTP'd to the inserter
-currently working on getting requests 1.0 (compat with Python 3.2) running, but unsuccessful so far
+main.py runs on CPanel as a cron job  
+Python is used to scrape https://dirtrally2.dirtgame.com/community-events for challenge and leaderboard data.
+> Today's challenges are sent to my phone (not currently working, vwtext blocks as spam probably).  
+> Yesterday's challenge and leaderboard data is saved as JSON.  
 
-plan B is to use urllib, but session cookies will take some time to figure out
+PHP is then used to read the JSON files and insert them into a MySQL database.
 
-
-# inserter:
-PHP program inserts JSON data into a MySQL database
+The only changes in the near future would be to get notifications working and then move them to a subscription model
