@@ -24,9 +24,8 @@ def get_today():
   # end of get_today()
 
 def get_challenges(days_ago):
-  print("Scraping challenges...")
   res = urllib.request.urlopen("https://dirtrally2.dirtgame.com/api/Challenge/Community")
-  print(res)
+  # print(res)
   decoded = res.read().decode()
   daily_data = json.loads(decoded)[0]
 
@@ -102,15 +101,15 @@ def get_leaderboards(list_of_challenges):
       list_of_entries.append(entry_details)
 
     pages = first_leaderboard['pageCount']
+    # print("Challenge #{}: Reading {} pages...".format(c["id"], pages))
 
     # run it again for each page
     for i in range(2, pages+1): # +1 to include max
-      print("Reading page {} of {}".format(i, pages))
       leaderboard = get_page(c, i)
       for entry in leaderboard["entries"]:
         entry_details = (c["id"], entry["rank"], entry["name"], entry["nationality"], entry["vehicleName"], entry["stageTime"], entry["stageDiff"], entry["isDnfEntry"])
         list_of_entries.append(entry_details)
   
-  print("{} entries created".format(len(list_of_entries)))
+  # print("{} entries created".format(len(list_of_entries)))
   return list_of_entries
   # end of get_leaderboards()
