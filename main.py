@@ -2,12 +2,12 @@ import json, subprocess, sys
 import scraper, notify
 
 
-# days_ago = int(sys.argv[1]) # 0 would be 'main.py'
+days_ago = int(sys.argv[1]) # 0 would be 'main.py'
 # days_ago = 1
 
 notify.notify(scraper.get_today())
 
-"""
+
 # scrape the source website
 challenges = scraper.get_challenges(days_ago)
 leaderboards = scraper.get_leaderboards(challenges)
@@ -25,5 +25,3 @@ with open("dr2-data/leaderboards_{}.json".format(date), "w") as f:
 
 # call the PHP script to insert data into database
 subprocess.call('php /home2/niemann8/dr2-data/insert.php', shell=True)
-
-"""
