@@ -63,7 +63,11 @@ def get_score(entry):
     diff_split = diff.strip("+").split(":")
     diff = float(diff_split[0]) * 60 + float(diff_split[1])
   
-  score = float(int((1-(diff/(time-diff))) * 10000)/100)
+  if (diff >= (time-diff)):
+    score = 0
+  else:
+    score = float(int((1-(diff/(time-diff))) * 10000)/100)
+    
   return score
 
 def get_leaderboards(list_of_challenges):
