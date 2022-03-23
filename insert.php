@@ -73,7 +73,7 @@ function insertChallenges($pdo, $dir, $filename) {
 
 // INSERT LEADERBOARDS
 function insertLeaderboards($pdo, $dir, $filename) {
-  $stmtInsertLeaderboard = $pdo->prepare("INSERT INTO leaderboard VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+  $stmtInsertLeaderboard = $pdo->prepare("INSERT INTO leaderboard VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
   try {
     $leaderboardJson = file_get_contents($dir.$filename);

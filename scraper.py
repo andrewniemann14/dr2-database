@@ -51,6 +51,20 @@ def get_challenges(days_ago):
   return list_of_challenges
   # end of get_challenges()
 
+def get_score(entry):
+  time = entry["stageTime"]
+  time_split = time.split(":")
+  time = float(time_split[0]) * 60 + float(time_split[1])
+
+  diff = entry["stageDiff"]
+  if diff == "--":
+    diff = 0
+  else:
+    diff_split = diff.strip("+").split(":")
+    diff = float(diff_split[0]) * 60 + float(diff_split[1])
+  
+  score = float(int((1-(diff/(time-diff))) * 10000)/100)
+  return score
 
 def get_leaderboards(list_of_challenges):
   def get_page(c, page):
@@ -97,7 +111,8 @@ def get_leaderboards(list_of_challenges):
     # do page 1 and get number of pages
     first_leaderboard = get_page(c, 1)
     for entry in first_leaderboard["entries"]:
-      entry_details = (c["id"], entry["rank"], entry["name"], entry["nationality"], entry["vehicleName"], entry["stageTime"], entry["stageDiff"], entry["isDnfEntry"])
+      score = get_score(entry)
+      entry_details = (c["id"], entry["rank"], entry["name"], entry["nationality"], entry["vehicleName"], entry["stageTime"], entry["stageDiff"], entry["isDnfEntry"], score)
       list_of_entries.append(entry_details)
 
     pages = first_leaderboard['pageCount']
@@ -107,7 +122,8 @@ def get_leaderboards(list_of_challenges):
     for i in range(2, pages+1): # +1 to include max
       leaderboard = get_page(c, i)
       for entry in leaderboard["entries"]:
-        entry_details = (c["id"], entry["rank"], entry["name"], entry["nationality"], entry["vehicleName"], entry["stageTime"], entry["stageDiff"], entry["isDnfEntry"])
+        score = get_score(entry)
+        entry_details = (c["id"], entry["rank"], entry["name"], entry["nationality"], entry["vehicleName"], entry["stageTime"], entry["stageDiff"], entry["isDnfEntry"], score)
         list_of_entries.append(entry_details)
   
   # print("{} entries created".format(len(list_of_entries)))
