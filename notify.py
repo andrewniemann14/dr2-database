@@ -26,8 +26,8 @@ def notify(challenges):
   # changing this to email, not text, since that doesn't work anyway
   recipient = 'andrewniemann14@gmail.com'
 
-  alert0 = classes[challenges[0]["vehicle_class"]] + " in " + challenges[0]["country"][1:]
-  alert1 = classes[challenges[1]["vehicle_class"]] + " in " + challenges[1]["country"][1:]
+  alert0 = classes[challenges[0]["vehicle_class"]] + " in " + challenges[0]["country"][1:] + " (" + challenges[0]["stage"] + ")"
+  alert1 = classes[challenges[1]["vehicle_class"]] + " in " + challenges[1]["country"][1:] + " (" + challenges[1]["stage"] + ")"
 
   msg = Message()
   msg['From'] = sender
