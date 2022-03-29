@@ -14,9 +14,11 @@ def get_today():
   for each_challenge in daily_data['challengeGroups'][0]["challenges"]:
     if (each_challenge["events"][0]["discipline"] == "eRally"):
       c = {
-        "vehicle_class": each_challenge["vehicleClass"],
+        "id": each_challenge["id"],
         "country": each_challenge["events"][0]["stages"][0]["country"],
-        "stage": each_challenge["events"][0]["stages"][0]["name"] if (each_challenge["events"][0]["discipline"] == "eRally") else each_challenge["events"][0]["stages"][0]["location"],
+        # "stage": each_challenge["events"][0]["stages"][0]["name"] if (each_challenge["events"][0]["discipline"] == "eRally") else each_challenge["events"][0]["stages"][0]["location"],
+        "stage": each_challenge["events"][0]["stages"][0]["name"],
+        "vehicle_class": each_challenge["vehicleClass"],
       }
       todays_challenges.append(c)
 
