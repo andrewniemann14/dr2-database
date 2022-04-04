@@ -1,3 +1,5 @@
+# /usr/bin/python3 /home2/niemann8/dr2-data/main.py 1
+
 import json, subprocess, sys
 import scraper, notify
 
