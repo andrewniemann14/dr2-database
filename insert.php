@@ -87,7 +87,6 @@ function insertLeaderboards($pdo, $dir, $filename) {
     }
     echo "$i leaderboard entries inserted\n";
     $pdo->commit();
-    rename($dir.$filename, $dir."backup/".$filename);
   } catch (Exception $e) {
     $pdo->rollback();
     throw $e;

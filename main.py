@@ -39,8 +39,8 @@ try:
 except:
   print("calling PHP insert script didn't work")
 
-# try:
+try:
 #   # call the racer update script
-#   subprocess.call('php /home2/niemann8/dr2-data/racer_update.php', shell=True)
-# except:
-#   print("calling PHP racer update script didn't work")
+  subprocess.call('php /home2/niemann8/dr2-data/update_racers.php', shell=True)
+except:
+  print("calling PHP racer update script didn't work")
