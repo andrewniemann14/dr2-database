@@ -1,4 +1,6 @@
 # notification doesn't work with certain Polish words
+# shouldn't need this anymore since implementing try/except in main.py
+
 # /usr/bin/python3 /home2/niemann8/dr2-data/mainnonotify.py 1
 
 import json, subprocess, sys
