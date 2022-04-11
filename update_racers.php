@@ -49,20 +49,20 @@ function updateRacerPoints($pdo, $dir, $filename) {
     $leaderboardJson = file_get_contents($dir.$filename);
     $leaderboardData = json_decode($leaderboardJson);
 
-    $entries_to_score = array_filter($leaderboardData, "check_for_valid_name");
     function check_for_valid_name($element) {
-      return ($element['name'] != 'DiRT Player' && $element['name'] != '');
+      return ($element[2] != 'DiRT Player' && $element[2] != '');
     }
+    $entries_to_score = array_filter($leaderboardData, "check_for_valid_name");
 
     $stmt = $pdo->prepare("INSERT INTO racers VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE points = points + ?");
     $names_to_update = array();
 
     // for each entry/name in yesterday's challenge results:
     foreach ($entries_to_score as $entry) {
-      $name = $entry['name'];
+      $name = $entry[2];
       array_push($names_to_update, $name);
-      $nationality = $entry['nationality'];
-      $points = $entry['score'];
+      $nationality = $entry[3];
+      $points = $entry[8];
 
       // INSERT: this should work
       // UPDATE: points are updated but new score is not yet calculated
@@ -79,11 +79,11 @@ function updateRacerScores($pdo, $names) {
     foreach ($names as $name) {
       $stmt = $pdo->prepare("SELECT AVG(score) FROM leaderboard WHERE name = ?");
       $stmt->execute(array($name));
-  
       $only_row = $stmt->fetch(PDO::FETCH_ASSOC);
       $score = $only_row['AVG(score)'];
   
-      $pdo->exec("UPDATE racers SET score = $score WHERE name = $name");
+      $stmt = $pdo->prepare("UPDATE racers SET score = ? WHERE name = ?");
+      $stmt->execute(array($score, $name));
     }
   } catch (Exception $e) {
     throw $e;
