@@ -33,8 +33,8 @@ function connect() {
 function handleFile($pdo, $dir, $filename) {
   if (strpos($filename, "eaderboards_2")) {
     try {
-      $names = updateRacerPoints($pdo, $dir, $filename);
-      updateRacerScores($pdo, $names);
+      $names = updatePlayerPoints($pdo, $dir, $filename);
+      updatePlayerScores($pdo, $names);
       rename($dir.$filename, $dir."backup/".$filename);
     } catch (Exception $e) {
       echo $e->getMessage();
@@ -44,7 +44,7 @@ function handleFile($pdo, $dir, $filename) {
 
 
 
-function updateRacerPoints($pdo, $dir, $filename) {
+function updatePlayerPoints($pdo, $dir, $filename) {
   try {
     $leaderboardJson = file_get_contents($dir.$filename);
     $leaderboardData = json_decode($leaderboardJson);
@@ -54,7 +54,7 @@ function updateRacerPoints($pdo, $dir, $filename) {
     }
     $entries_to_score = array_filter($leaderboardData, "check_for_valid_name");
 
-    $stmt = $pdo->prepare("INSERT INTO racers VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE points = points + ?");
+    $stmt = $pdo->prepare("INSERT INTO players VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE points = points + ?");
     $names_to_update = array();
 
     // for each entry/name in yesterday's challenge results:
@@ -74,7 +74,7 @@ function updateRacerPoints($pdo, $dir, $filename) {
   }
 }
 
-function updateRacerScores($pdo, $names) {
+function updatePlayerScores($pdo, $names) {
   try {
     foreach ($names as $name) {
       $stmt = $pdo->prepare("SELECT AVG(score) FROM leaderboard WHERE name = ?");
@@ -82,7 +82,7 @@ function updateRacerScores($pdo, $names) {
       $only_row = $stmt->fetch(PDO::FETCH_ASSOC);
       $score = $only_row['AVG(score)'];
   
-      $stmt = $pdo->prepare("UPDATE racers SET score = ? WHERE name = ?");
+      $stmt = $pdo->prepare("UPDATE players SET score = ? WHERE name = ?");
       $stmt->execute(array($score, $name));
     }
   } catch (Exception $e) {

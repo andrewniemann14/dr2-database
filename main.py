@@ -41,6 +41,6 @@ except:
 
 try:
 #   # call the racer update script
-  subprocess.call('php /home2/niemann8/dr2-data/update_racers.php', shell=True)
+  subprocess.call('php /home2/niemann8/dr2-data/update_players.php', shell=True)
 except:
   print("calling PHP racer update script didn't work")
