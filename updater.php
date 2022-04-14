@@ -29,6 +29,10 @@ function connect() {
   }
 }
 
+function check_for_valid_name($element) {
+  return ($element[2] != 'DiRT Player' && $element[2] != '');
+}
+
 // identify challenge vs leaderboard, call function
 function handleFile($pdo, $dir, $filename) {
   if (strpos($filename, "eaderboards_2")) {
@@ -49,9 +53,6 @@ function updatePlayerPoints($pdo, $dir, $filename) {
     $leaderboardJson = file_get_contents($dir.$filename);
     $leaderboardData = json_decode($leaderboardJson);
 
-    function check_for_valid_name($element) {
-      return ($element[2] != 'DiRT Player' && $element[2] != '');
-    }
     $entries_to_score = array_filter($leaderboardData, "check_for_valid_name");
 
     $stmt = $pdo->prepare("INSERT INTO players VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE points = points + ?");
