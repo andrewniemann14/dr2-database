@@ -11,10 +11,10 @@ try:
 except:
   print("scraping today didn't work")
 
-try:
-  notify.notify(today)
-except:
-  print("notify didn't work")
+# try:
+#   notify.notify(today)
+# except:
+#   print("notify didn't work")
 
 # days_ago gives us a backdoor in case the source site is down one day
 try:
@@ -40,7 +40,7 @@ except:
   print("calling PHP insert script didn't work")
 
 try:
-#   # call the racer update script
-  subprocess.call('php /home2/niemann8/dr2-data/update_players.php', shell=True)
+  # call the racer update script
+  subprocess.call('php /home2/niemann8/dr2-data/update_racers.php', shell=True)
 except:
   print("calling PHP racer update script didn't work")
