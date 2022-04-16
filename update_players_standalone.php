@@ -47,20 +47,22 @@ $names_to_add = array_diff($all_names, $already_names);
 
 print(count($names_to_add).' names to add');
 foreach ($names_to_add as $name) {
-  $stmtSelect = $pdo->prepare("SELECT nationality, score, AVG(score) FROM leaderboard WHERE name = ?");
+  $stmtSelect = $pdo->prepare("SELECT nationality, score FROM leaderboard WHERE name = ?");
   $stmtSelect->execute(array($name));
 
   $points = 0;
+  $entries = 0;
 
   $first_row = $stmtSelect->fetch(PDO::FETCH_ASSOC);
   $nationality = $first_row['nationality'];
-  $score = $first_row['AVG(score)'];
   $points += $first_row['score'];
+  $entries++;
   while ($row = $stmtSelect->fetch(PDO::FETCH_ASSOC)) {
     $points += $row['score'];
+    $entries++;
   }
   
-  $stmtUpdate = $pdo->prepare("INSERT INTO players VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE points = points + ?, score = ?");
-  $stmtUpdate->execute(array($name, $nationality, $points, $score, $points, $score));
-  print('*');
+  $stmtUpdate = $pdo->prepare("INSERT INTO players VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE points = points + ?, entries = entries + 1");
+  $stmtUpdate->execute(array($name, $nationality, $points, $entries, $points));
+  // print('*');
 }
