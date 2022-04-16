@@ -65,8 +65,6 @@ function updatePlayerPoints($pdo, $dir, $filename) {
       $nationality = $entry[3];
       $points = $entry[8];
 
-      // INSERT: this should work
-      // UPDATE: points are updated but new score is not yet calculated
       $stmt->execute(array($name, $nationality, $points, $points, $points));
     }
     return $names_to_update;
@@ -76,16 +74,27 @@ function updatePlayerPoints($pdo, $dir, $filename) {
 }
 
 function updatePlayerScores($pdo, $names) {
+  $scores = array();
+  $stmt = $pdo->prepare("SELECT AVG(score) FROM leaderboard WHERE name = ?");
   try {
+
+    // calculates the score for each name and stores it in a PHP array
     foreach ($names as $name) {
-      $stmt = $pdo->prepare("SELECT AVG(score) FROM leaderboard WHERE name = ?");
       $stmt->execute(array($name));
       $only_row = $stmt->fetch(PDO::FETCH_ASSOC);
       $score = $only_row['AVG(score)'];
-  
-      $stmt = $pdo->prepare("UPDATE players SET score = ? WHERE name = ?");
-      $stmt->execute(array($score, $name));
+      array_push($scores, $score);
     }
+
+    // feeds that PHP array into a MySQL prepared statement
+    $names_and_scores = array_combine($names, $scores);
+    $stmt = $pdo->prepare("UPDATE players SET score = ? WHERE name = ?");
+    $pdo->beginTransaction();
+    foreach ($names_and_scores as $name_score_pair) {
+      $stmt->execute(array($name_score_pair[0], $name_score_pair[1]));
+    }
+    $pdo->commit();
+    echo(count($names_and_scores).' names updated');
   } catch (Exception $e) {
     throw $e;
   }

@@ -1,4 +1,4 @@
-<!-- php /home2/niemann8/dr2-data/update_racers_standalone.php -->
+<!-- php /home2/niemann8/dr2-data/update_players_standalone.php -->
 
 <?php
 ini_set('display_errors', 1);
@@ -35,7 +35,7 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 }
 
 $already_names = array();
-$stmt = $pdo->prepare("SELECT DISTINCT name FROM racers");
+$stmt = $pdo->prepare("SELECT DISTINCT name FROM players");
 $stmt->execute();
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
   array_push($already_names, $row['name']);
@@ -43,12 +43,9 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
 $names_to_add = array_diff($all_names, $already_names);
 
-
-$i = 0;
 // for each name in array, query ALL entries and insert/update to database
 
-print(count($names_to_add));
-
+print(count($names_to_add).' names to add');
 foreach ($names_to_add as $name) {
   $stmtSelect = $pdo->prepare("SELECT nationality, score, AVG(score) FROM leaderboard WHERE name = ?");
   $stmtSelect->execute(array($name));
@@ -63,7 +60,7 @@ foreach ($names_to_add as $name) {
     $points += $row['score'];
   }
   
-  $stmtUpdate = $pdo->prepare("INSERT INTO racers VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE points = points + ?, score = ?");
+  $stmtUpdate = $pdo->prepare("INSERT INTO players VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE points = points + ?, score = ?");
   $stmtUpdate->execute(array($name, $nationality, $points, $score, $points, $score));
-  print(++$i.'_');
+  print('*');
 }
